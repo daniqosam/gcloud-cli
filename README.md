@@ -36,3 +36,30 @@ default  europe-west6             default  10.172.0.0/20
 default  asia-south1              default  10.160.0.0/20
 default  us-west4                 default  10.182.0.0/20
 ```
+
+### create vpc dan subnets
+```bash
+#create vpc custom subnet 
+gcloud compute networks create [VPC_NAME] --description "descriprion vpc" --subnet-mode custom
+
+gcloud compute networks create vpc-bku-devel --description "vpc untuk project bku development" --subnet-mode custom
+Created [https://www.googleapis.com/compute/v1/projects/bkudevel/global/networks/vpc-bku-devel].
+NAME           SUBNET_MODE  BGP_ROUTING_MODE  IPV4_RANGE  GATEWAY_IPV4
+vpc-bku-devel  CUSTOM       REGIONAL
+
+#example firewall config 
+$ gcloud compute firewall-rules create <FIREWALL_NAME> --network vpc-bku-devel --allow tcp,udp,icmp --source-ranges <IP_RANGE>
+$ gcloud compute firewall-rules create <FIREWALL_NAME> --network vpc-bku-devel --allow tcp:22,tcp:3389,icmp
+
+#create vpc subnet
+gcloud compute networks subnets create subnet-vpc-bku-devel-asia-southeast2-1 --network vpc-bku-devel --region asia-southeast2 --range 10.0.1.0/24
+
+#check list subnet
+gcloud compute networks subnets list 
+gcloud compute networks subnets list --network vpc-bku-devel
+
+#create firewall
+gcloud compute firewall-rules create vpc-bku-allow-rdp --network vpc-bku-devel --allow tcp:3389
+gcloud compute firewall-rules create vpc-bku-allow-ssh --network vpc-bku-devel --allow tcp:22
+gcloud compute firewall-rules create vpc-bku-allow-postgres --network vpc-bku-devel --allow tcp:5432
+```
